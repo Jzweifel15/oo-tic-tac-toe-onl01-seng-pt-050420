@@ -10,11 +10,11 @@ class TicTacToe
     [1, 4, 7],
     [2, 5, 8],
     [0, 4, 8],
-    [6, 4, 2]
+    [2, 4, 6]
   ]
   
-  def initialize(board = nil)
-   @board = board || Array.new(9, " ")
+  def initialize
+   @board = Array.new(9, " ")
   end
   
   def display_board
@@ -29,12 +29,12 @@ class TicTacToe
     input.to_i - 1
   end
   
-  def move(index, token = "X")
+  def move(index, token)
     @board[index] = token
   end
   
   def position_taken?(index)
-    @board[index] == "X" || @board[index] == "O"
+    @board[index] != " "
   end
   
   def valid_move?(index)
@@ -44,7 +44,7 @@ class TicTacToe
   def turn_count
     turn_number = 0 
     @board.each do |position|
-      if position == "X" || position == "O"
+      if position != " "
         turn_number += 1 
       end
     end
@@ -73,22 +73,11 @@ class TicTacToe
   end
   
   def won?
-    WIN_COMBINATIONS.each {|win_combo|
-      index_0 = win_combo[0]
-      index_1 = win_combo[1]
-      index_2 = win_combo[2]
-
-      position_1 = @board[index_0]
-      position_2 = @board[index_1]
-      position_3 = @board[index_2]
-
-      if position_1 == "X" && position_2 == "X" && position_3 == "X"
-        return win_combo
-      elsif position_1 == "O" && position_2 == "O" && position_3 == "O"
-        return win_combo
+    WIN_COMBINATIONS.any? do |combo|
+      if position_taken?(combo[0]) && @board[combo[0]] == @board[combo[1]] && @board[combo[1]] == @board[combo[2]]
+        return combo
       end
-    }
-    return false
+    end
   end
   
   def full?
@@ -96,7 +85,7 @@ class TicTacToe
   end
   
   def draw?
-    if !(won?) && (full?)
+    if !(won?) && full?
       return true
     elsif won?
       return false
@@ -104,7 +93,7 @@ class TicTacToe
   end
   
   def over?
-    won? || full? || draw?
+    won? || draw?
   end
   
   def winner
@@ -115,18 +104,8 @@ class TicTacToe
   end
   
   def play
-      while over? == false
-      	turn
-      end
-
-      if draw?
-      	puts "Cat's Game!"
-      elsif winner == "X"
-      	puts "Congratulations X!"
-      elsif winner == "O"
-      	puts "Congratulations O!"
-      end
-      
+    turn until over?
+    puts winner ? "Congratulations #{winner}!" : "Cat's Game!"
   end
   
 end 
